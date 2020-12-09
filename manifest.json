@@ -1,0 +1,14 @@
+{
+  "name": "Advent of code graph",
+  "version": "1.0",
+  "description": "Nice graph of Advent of code stats",
+  "manifest_version": 2,
+  "content_scripts": [
+    {
+      "matches": [
+        "https://adventofcode.com/*/leaderboard/private/view/*"
+      ],
+      "js": ["chart.js", "functions.js", "contentScript.js"]
+    }
+  ]
+}
