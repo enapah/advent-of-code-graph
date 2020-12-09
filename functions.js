@@ -92,7 +92,7 @@ const {rainbowColor, getDayNames, getChartData} = (function () {
           ...member,
           days,
           accPerDay: days.reduce(
-            (acc, day, i) => (day.points ? [...acc, day.points + (acc[i - 1] || 0)] : [...acc, acc[i - 1] || 0]),
+            (acc, day, i) => (day.points ? [...acc, day.points + (acc[i - 1] || 0)] : [...acc, null]),
             []
           )
         };
@@ -111,7 +111,7 @@ const {rainbowColor, getDayNames, getChartData} = (function () {
         if (
           dayScore &&
           Date.now() >
-            new Date(`${year}-12-${String(Math.floor((dayIndex + 1) / 2)).padStart(2, '0')}T05:00:00.000Z`).getTime()
+            new Date(`${year}-12-${String(Math.floor((dayIndex + 2) / 2)).padStart(2, '0')}T05:00:00.000Z`).getTime()
         ) {
           return dayScore - maxEachDay[dayIndex];
         }
