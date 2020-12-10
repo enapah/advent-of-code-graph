@@ -1,7 +1,7 @@
 const run = async () => {
   const [, year, leaderboard] = window.location.href.match(/\/(\d+)\/leaderboard\/private\/view\/(\d+)/);
   const me = document.querySelector('.user').firstChild.textContent.trim();
-  const data = await getChartData(leaderboard, year);
+  const data = await getChartData(leaderboard, year, me);
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 

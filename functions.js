@@ -27,15 +27,14 @@ const {rainbowColor, getDayNames, getChartData} = (function () {
 
   const range = (start, end) => [...Array(end - start + 1)].map((_, i) => start + i);
 
-  const getStartOfDay = (year, day) =>
-    new Date(`${year}-12-${String(day).padStart(2, '0')}T05:00:00.000Z`).getTime() / 1000;
+  const getStartOfDay = (year, day) => new Date(`${year}-12-${String(day).padStart(2, '0')}T05:00:00.000Z`).getTime();
 
   const parseStats = (stats, year) =>
     Object.values(stats.members).map((member) => ({
       name: member.name,
       score: member.local_score,
       days: range(1, 25).flatMap((day) => {
-        const start = getStartOfDay(year, day);
+        const start = getStartOfDay(year, day) / 1000;
 
         return [1, 2].map((part) => {
           const star = member.completion_day_level[day]?.[part]?.get_star_ts ?? 0;
@@ -70,7 +69,7 @@ const {rainbowColor, getDayNames, getChartData} = (function () {
     2020: [0]
   };
 
-  const getChartData = async (leaderboard, year) => {
+  const getChartData = async (leaderboard, year, me) => {
     const json = await fetch(`${leaderboard}.json`).then((res) => res.json());
 
     const stats = parseStats(json, year);
@@ -100,7 +99,7 @@ const {rainbowColor, getDayNames, getChartData} = (function () {
       .sort((a, b) => b.score - a.score)
       .filter((m) => m.score > 0);
 
-    const maxEachDay = range(0, 49).map((i) => Math.max(...decorated.map((member) => member.accPerDay[i])));
+    const baseline = (decorated.find((member) => member.name === me) || decorated[0]).accPerDay;
 
     return decorated.map((member) => ({
       ...member,
@@ -108,14 +107,9 @@ const {rainbowColor, getDayNames, getChartData} = (function () {
         if (ignoredDays[year].includes(Math.floor(dayIndex / 2))) {
           return 0;
         }
-        if (
-          dayScore &&
-          Date.now() >
-            new Date(`${year}-12-${String(Math.floor((dayIndex + 2) / 2)).padStart(2, '0')}T05:00:00.000Z`).getTime()
-        ) {
-          return dayScore - maxEachDay[dayIndex];
-        }
-        return null;
+        return dayScore && Date.now() > getStartOfDay(year, Math.floor((dayIndex + 2) / 2))
+          ? dayScore - baseline[dayIndex]
+          : null;
       })
     }));
   };
