@@ -1,4 +1,4 @@
-const {rainbowColor, getDayNames, getChartData} = (function () {
+const {rainbowColor, getDayNames, getChartData, selectDataSet} = (function () {
   const getRgb = (h) => {
     const i = Math.floor(h * 6);
 
@@ -69,6 +69,8 @@ const {rainbowColor, getDayNames, getChartData} = (function () {
     2020: [0]
   };
 
+  let decorated;
+
   const getChartData = async (leaderboard, year, me) => {
     const json = await fetch(`${leaderboard}.json`).then((res) => res.json());
 
@@ -76,7 +78,7 @@ const {rainbowColor, getDayNames, getChartData} = (function () {
 
     const timesPerDay = range(0, 49).map((day) => stats.map((member) => member.days[day].time).sort((a, b) => a - b));
 
-    const decorated = stats
+    decorated = stats
       .map((member) => {
         const days = member.days.map(({time}, day) => ({
           time,
@@ -114,5 +116,24 @@ const {rainbowColor, getDayNames, getChartData} = (function () {
     }));
   };
 
-  return {rainbowColor, getDayNames, getChartData};
+  return {
+    rainbowColor,
+    getDayNames,
+    getChartData,
+    selectDataSet: (year, i) => {
+      const baseline = decorated[i].accPerDay;
+
+      return decorated.map((member) => ({
+        ...member,
+        data: member.accPerDay.map((dayScore, dayIndex) => {
+          if (ignoredDays[year].includes(Math.floor(dayIndex / 2))) {
+            return 0;
+          }
+          return dayScore && Date.now() > getStartOfDay(year, Math.floor((dayIndex + 2) / 2))
+            ? dayScore - baseline[dayIndex]
+            : null;
+        })
+      }));
+    }
+  };
 })();

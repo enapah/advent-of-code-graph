@@ -7,7 +7,7 @@ const run = async () => {
 
   document.querySelector('body').appendChild(canvas);
 
-  new Chart(ctx, {
+  const chart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: getDayNames(),
@@ -60,6 +60,23 @@ const run = async () => {
         position: 'bottom',
         labels: {
           boxWidth: 20
+        }
+      },
+      onClick: (e, arr) => {
+        const elements = chart.getElementAtEvent(e);
+
+        if (elements.length > 0) {
+          let data = selectDataSet(year, elements[0]._datasetIndex);
+          chart.data.datasets = data.map((member, i) => ({
+            label: member.name,
+            borderColor: rainbowColor(i, data.length),
+            borderWidth: 1,
+            fill: false,
+            data: member.data,
+            hidden: arr.find((x) => x._datasetIndex === i)?.hidden ?? true
+          }));
+          console.log(chart.data);
+          chart.update();
         }
       }
     }
