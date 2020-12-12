@@ -32,7 +32,7 @@ const run = async () => {
       const stars = row.querySelectorAll('.privboard-star-both,.privboard-star-firstonly,.privboard-star-unlocked');
 
       stars.forEach((star, day) => {
-        star.setAttribute('title', times[i].slice(day * 2, day * 2 + 2).join('|'));
+        star.setAttribute('title', times[i].slice(day * 2, day * 2 + 2).join(' | '));
       });
     });
 
